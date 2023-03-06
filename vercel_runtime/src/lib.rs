@@ -1,13 +1,11 @@
 pub mod body;
 pub mod request;
 pub mod response;
-use body::Body;
 pub use lambda_http;
-use lambda_http::{service_fn, tower::ServiceBuilder};
+use lambda_http::{service_fn, tower::ServiceBuilder, Response as LambdaResponse};
 pub use lambda_runtime;
 use lambda_runtime::LambdaEvent;
 use request::{VercelEvent, VercelRequest};
-pub use response::IntoResponse;
 use response::VercelResponse;
 use std::future::Future;
 use tracing::{debug, error};
@@ -15,7 +13,10 @@ use tracing::{debug, error};
 pub type Request = lambda_http::http::Request<Body>;
 pub type Error = lambda_http::Error;
 
-pub async fn run<T: FnMut(Request) -> F, F: Future<Output = Result<impl IntoResponse, Error>>>(
+pub use body::Body;
+pub use lambda_http::Response;
+
+pub async fn run<T: FnMut(Request) -> F, F: Future<Output = Result<Response<Body>, Error>>>(
     f: T,
 ) -> Result<(), Error> {
     let handler = ServiceBuilder::new()
@@ -44,6 +45,6 @@ pub fn process_request(lambda_event: LambdaEvent<VercelEvent>) -> lambda_http::h
     }
 }
 
-pub fn process_response(response: impl IntoResponse) -> VercelResponse {
-    VercelResponse::from(response.into_response())
+pub fn process_response(response: LambdaResponse<Body>) -> VercelResponse {
+    VercelResponse::from(response)
 }

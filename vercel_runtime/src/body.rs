@@ -52,20 +52,15 @@ use std::{borrow::Cow, ops::Deref, str};
 ///   _ => false
 /// })
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub enum Body {
     /// An empty body
+    #[default]
     Empty,
     /// A body containing string data
     Text(String),
     /// A body containing binary data
     Binary(Vec<u8>),
-}
-
-impl Default for Body {
-    fn default() -> Self {
-        Body::Empty
-    }
 }
 
 impl From<()> for Body {
