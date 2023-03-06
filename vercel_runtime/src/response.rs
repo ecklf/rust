@@ -9,20 +9,20 @@ use serde_derive::Serialize;
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct VercelResponse {
-    pub status_code: u16,
+pub struct EventResponse {
+    pub(crate) status_code: u16,
     #[serde(
         skip_serializing_if = "HeaderMap::is_empty",
         serialize_with = "serialize_headers"
     )]
-    pub headers: HeaderMap<HeaderValue>,
+    pub(crate) headers: HeaderMap<HeaderValue>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body: Option<Body>,
+    pub(crate) body: Option<Body>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub encoding: Option<String>,
+    pub(crate) encoding: Option<String>,
 }
 
-impl Default for VercelResponse {
+impl Default for EventResponse {
     fn default() -> Self {
         Self {
             status_code: 200,
@@ -45,7 +45,7 @@ where
     map.end()
 }
 
-impl<T> From<Response<T>> for VercelResponse
+impl<T> From<Response<T>> for EventResponse
 where
     T: Into<Body>,
 {
@@ -56,7 +56,7 @@ where
             b @ Body::Text(_) => (None, Some(b)),
             b @ Body::Binary(_) => (Some("base64".to_string()), Some(b)),
         };
-        VercelResponse {
+        EventResponse {
             status_code: parts.status.as_u16(),
             body,
             headers: parts.headers,
@@ -81,7 +81,7 @@ where
 ///   Response::new(Body::from("hello")).body()
 /// );
 /// ```
-pub trait IntoResponse {
+pub(crate) trait IntoResponse {
     /// Return a translation of `self` into a `Response<Body>`
     fn into_response(self) -> Response<Body>;
 }

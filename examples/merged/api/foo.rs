@@ -1,6 +1,6 @@
 use runtime_demo::choose_starter;
 use serde_json::json;
-use vercel_runtime::{lambda_http::http::StatusCode, Body, Error, Request, Response};
+use vercel_runtime::{Body, Error, Request, Response, StatusCode};
 
 pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
     dbg!(_req);
