@@ -33,7 +33,6 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
             json!({
               "message": format!("I choose you, {}!", starter),
             })
-            .to_string()
             .into(),
         )?;
 

@@ -41,7 +41,6 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
                 "time": format!("{:.2?}", duration),
                 "pi": pi
             })
-            .to_string()
             .into(),
         )?;
 

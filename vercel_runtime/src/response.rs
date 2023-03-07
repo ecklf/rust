@@ -1,6 +1,5 @@
 use crate::body::Body;
 use lambda_http::http::{
-    self,
     header::{HeaderMap, HeaderValue},
     Response,
 };
@@ -62,58 +61,5 @@ where
             headers: parts.headers,
             encoding,
         }
-    }
-}
-
-/// A conversion of self into a `Response`
-///
-/// Implementations for `Response<B> where B: Into<Body>`,
-/// `B where B: Into<Body>` and `serde_json::Value` are provided
-/// by default
-///
-/// # example
-///
-/// ```rust
-/// use vercel_runtime::{Body, IntoResponse, Response};
-///
-/// assert_eq!(
-///   "hello".into_response().body(),
-///   Response::new(Body::from("hello")).body()
-/// );
-/// ```
-pub(crate) trait IntoResponse {
-    /// Return a translation of `self` into a `Response<Body>`
-    fn into_response(self) -> Response<Body>;
-}
-
-impl<B> IntoResponse for Response<B>
-where
-    B: Into<Body>,
-{
-    fn into_response(self) -> Response<Body> {
-        let (parts, body) = self.into_parts();
-        Response::from_parts(parts, body.into())
-    }
-}
-
-impl<B> IntoResponse for B
-where
-    B: Into<Body>,
-{
-    fn into_response(self) -> Response<Body> {
-        Response::new(self.into())
-    }
-}
-
-impl IntoResponse for serde_json::Value {
-    fn into_response(self) -> Response<Body> {
-        Response::builder()
-            .header(http::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::to_string(&self)
-                    .expect("unable to serialize serde_json::Value")
-                    .into(),
-            )
-            .expect("unable to build http::Response")
     }
 }

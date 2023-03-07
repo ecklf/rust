@@ -1,6 +1,7 @@
 //! Provides a Vercel Lambda oriented request and response body entity interface
 use base64::display::Base64Display;
 use serde::ser::{Error as SerError, Serialize, Serializer};
+use serde_json::Value;
 use std::{borrow::Cow, ops::Deref, str};
 
 /// Representation of http request and response bodies as supported
@@ -141,6 +142,12 @@ impl From<Body> for Vec<u8> {
             Body::Text(t) => t.into_bytes(),
             Body::Binary(b) => b,
         }
+    }
+}
+
+impl From<Value> for Body {
+    fn from(v: Value) -> Self {
+        Body::Text(v.to_string())
     }
 }
 
