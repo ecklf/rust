@@ -7,16 +7,11 @@ use response::EventResponse;
 use std::future::Future;
 use tracing::{debug, error};
 
-pub use lambda_http::Body;
-
-pub type Error = lambda_http::Error;
 pub type Event<'a> = LambdaEvent<VercelEvent<'a>>;
-pub use lambda_http::http::StatusCode;
-pub use lambda_http::service_fn;
-pub use lambda_http::tower::ServiceBuilder;
-pub use lambda_http::Request;
-pub use lambda_http::RequestExt;
-pub use lambda_http::Response;
+
+pub use lambda_http::{
+    http::StatusCode, service_fn, tower::ServiceBuilder, Body, Error, Request, RequestExt, Response,
+};
 pub use lambda_runtime::run as run_service;
 
 pub async fn run<T: FnMut(Request) -> F, F: Future<Output = Result<Response<Body>, Error>>>(
