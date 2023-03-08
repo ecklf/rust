@@ -1,6 +1,13 @@
+use serde::Serialize;
 use std::collections::HashMap;
 use url::Url;
 use vercel_runtime::{http::bad_request, run, Body, Error, Request, Response, StatusCode};
+
+#[derive(Serialize)]
+pub struct APIError {
+    pub message: &'static str,
+    pub code: &'static str,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -14,7 +21,10 @@ pub async fn handler(req: Request) -> Result<Response<Body>, Error> {
 
     match id_key {
         None => {
-            return bad_request("Invalid query string");
+            return bad_request(APIError {
+                message: "Query string is invalid",
+                code: "query_string_invalid",
+            });
         }
         Some(id) => Ok(Response::builder()
             .status(StatusCode::OK)

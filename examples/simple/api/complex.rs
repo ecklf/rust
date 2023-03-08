@@ -6,6 +6,17 @@ use vercel_runtime::{
     Request, RequestExt, Response, ServiceBuilder, StatusCode,
 };
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Payload {
+    trainer_name: String,
+}
+
+#[derive(Serialize)]
+pub struct APIError {
+    pub message: &'static str,
+    pub code: &'static str,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt()
@@ -23,18 +34,19 @@ async fn main() -> Result<(), Error> {
     run_service(handler).await
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Payload {
-    trainer_name: String,
-}
-
 pub async fn handler(req: Request) -> Result<Response<Body>, Error> {
     tracing::info!("Choosing a starter Pokemon");
     let payload = req.payload::<Payload>();
 
     match payload {
-        Err(..) => bad_request("Invalid payload"),
-        Ok(None) => bad_request("Invalid payload"),
+        Err(..) => bad_request(APIError {
+            message: "Invalid payload",
+            code: "invalid_payload",
+        }),
+        Ok(None) => bad_request(APIError {
+            message: "No payload",
+            code: "no_payload",
+        }),
         Ok(Some(payload)) => {
             let starter = choose_starter();
 
